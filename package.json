@@ -1,20 +1,21 @@
 {
     "name": "disco-bot",
     "version": "1.0.0",
-    "description": "",
+    "description": "My discord bot for entertainment and educational purposes",
     "main": "index.js",
     "scripts": {
-        "nodemon": "nodemon index.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "dev": "node --watch index.js",
+        "start": "node index.js",
+        "test": "node --test"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
+    "engines": {
+        "node": "18.x"
+    },
     "dependencies": {
         "discord.js": "^14.14.1",
         "dotenv": "^16.4.1"
-    },
-    "devDependencies": {
-        "nodemon": "^3.0.3"
     }
 }
