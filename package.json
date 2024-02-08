@@ -4,8 +4,8 @@
     "description": "My discord bot for entertainment and educational purposes",
     "main": "index.js",
     "scripts": {
-        "dev": "node --watch index.js",
-        "start": "node index.js",
+        "dev": "node --watch ./src/index.js",
+        "start": "node ./src/index.js",
         "test": "node --test"
     },
     "keywords": [],
