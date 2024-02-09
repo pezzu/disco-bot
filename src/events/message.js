@@ -1,8 +1,13 @@
-const { Events } = require("discord.js");
+const fs = require("fs");
 
-module.exports = {
-    name: Events.MessageCreate,
-    execute(message) {
-        console.log("content", message.content);
-    },
-};
+function processMessage(message) {
+    console.log(`messagge received! ${message.content}`);
+
+    if (message.author.bot) return;
+
+    if (message.content.startsWith("https://twitter.com/")) {
+        message.reply({ files: [fs.createReadStream(__dirname + "/../../1.mp4")] });
+    }
+}
+
+module.exports = { processMessage };
