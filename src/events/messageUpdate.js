@@ -1,7 +1,7 @@
 const { Events } = require("discord.js");
-const { processMessage } = require("./message.js");
+const { replyWithMedia } = require("../media-fetch/message.js");
 
 module.exports = {
     name: Events.MessageUpdate,
-    execute: (oldMessage, newMessage) => processMessage(newMessage),
+    execute: (oldMessage, newMessage) => replyWithMedia(newMessage),
 };
