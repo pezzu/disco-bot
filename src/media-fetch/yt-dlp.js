@@ -11,6 +11,8 @@ async function download(url) {
         "after_move:filepath",
         "--path",
         DOWNLOAD_DIR,
+        "-o",
+        "%(id)s.%(ext)s",
         url,
         "--restrict-filenames",
         "--no-simulate",
