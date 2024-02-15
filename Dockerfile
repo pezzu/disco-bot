@@ -2,11 +2,14 @@ FROM node:20 AS build-env
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY ./src ./src
+RUN mkdir -p /app/bin && \
+    wget -O /app/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux && \
+    chmod +x /app/bin/yt-dlp
 
+COPY package*.json ./
 RUN npm ci --omit=dev
 
+COPY ./src ./src
 
 FROM gcr.io/distroless/nodejs20-debian12
 

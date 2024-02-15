@@ -1,12 +1,15 @@
-const fs = require("fs");
+const fs = require("node:fs");
+const path = require("node:path");
 const util = require("node:util");
 const execFile = util.promisify(require("node:child_process").execFile);
 
 const DOWNLOAD_DIR = "/tmp";
 const SUPPORTED_URLS = ["https://twitter.com/", "https://x.com/"];
 
+const yt_dlp = path.join(process.cwd(), "bin", "yt-dlp");
+
 async function download(url) {
-    const { code, stdout, stderr } = await execFile("/home/pesu/yt-dlp", [
+    const { code, stdout, stderr } = await execFile(yt_dlp, [
         "--print",
         "after_move:filepath",
         "--path",
