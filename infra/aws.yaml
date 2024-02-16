@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Discord Bot infrastructure
+
+Parameters:
+    Token:
+        Type: String
+        Description: Bot Security Token
+
+Resources:
+    DicordBotToken:
+        Type: "AWS::SSM::Parameter"
+        Properties:
+            Name: DISCORD_BOT_TOKEN
+            Type: String
+            Value: !Ref Token
+            Description: "Discord Bot Security Token"
