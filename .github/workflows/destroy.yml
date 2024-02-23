@@ -1,0 +1,11 @@
+name: Destroy
+
+on:
+    workflow_dispatch:
+
+jobs:
+    destroy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Destroy Infrastructure
+              run: aws cloudformation delete-stack --stack-name Discord-Bot-Service
