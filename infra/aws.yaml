@@ -10,7 +10,7 @@ Resources:
     DicordBotToken:
         Type: "AWS::SSM::Parameter"
         Properties:
-            Name: DISCORD_BOT_TOKEN
-            Type: String
-            Value: !Ref Token
+            Name: disco-bot/DISCORD_BOT_TOKEN
+            Type: SecureString
+            Value: !Ref Discord-Token
             Description: "Discord Bot Security Token"

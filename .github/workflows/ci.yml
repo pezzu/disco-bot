@@ -34,5 +34,5 @@ jobs:
                   aws cloudformation deploy \
                   --template-file infra/aws.yaml \
                   --stack-name Discord-Bot-Service \
-                  --parameter-overrides Token=${{ secrets.DISCORD_BOT_TOKEN }}
+                  --parameter-overrides Discord-Token=${{ secrets.DISCORD_BOT_TOKEN }}
                   # --capabilities CAPABILITY_IAM
