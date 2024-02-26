@@ -2,15 +2,15 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Discord Bot infrastructure
 
 Parameters:
-    Token:
+    DiscordToken:
         Type: String
-        Description: Bot Security Token
+        Description: Discord Bot Security Token
 
 Resources:
-    DicordBotToken:
+    DiscordBotToken:
         Type: "AWS::SSM::Parameter"
         Properties:
-            Name: disco-bot/DISCORD_BOT_TOKEN
-            Type: SecureString
-            Value: !Ref Discord-Token
+            Name: /discord-bot/DISCORD_BOT_TOKEN
+            Type: String
+            Value: !Ref DiscordToken
             Description: "Discord Bot Security Token"
