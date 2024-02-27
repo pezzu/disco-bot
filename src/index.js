@@ -1,14 +1,20 @@
-require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const { Client, GatewayIntentBits } = require("discord.js");
+const { SSMClient, GetParameterCommand } = require("@aws-sdk/client-ssm");
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+    ],
 });
 
 const eventsPath = path.join(__dirname, "events");
-const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
+const eventFiles = fs
+    .readdirSync(eventsPath)
+    .filter((file) => file.endsWith(".js"));
 
 for (const file of eventFiles) {
     const filePath = path.join(eventsPath, file);
@@ -20,4 +26,16 @@ for (const file of eventFiles) {
     }
 }
 
-client.login(process.env.DISCORD_BOT_TOKEN);
+const ssm = new SSMClient({ region: "us-east-1" });
+const param = {
+    Name: "/discord-bot/DISCORD_BOT_TOKEN",
+    WithDecryption: false,
+};
+
+ssm.send(new GetParameterCommand(param))
+    .then((data) => {
+        client.login(data.Parameter.Value);
+    })
+    .catch((error) => {
+        console.error(error);
+    });
