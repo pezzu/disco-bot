@@ -14,3 +14,8 @@ Resources:
             Type: String
             Value: !Ref DiscordToken
             Description: "Discord Bot Security Token"
+    Repository:
+        Type: "AWS::ECR::Repository"
+        Properties:
+            RepositoryName: "discord-bot"
+            EmptyOnDelete: true
