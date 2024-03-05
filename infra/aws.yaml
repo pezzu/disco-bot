@@ -3,19 +3,64 @@ Description: Discord Bot infrastructure
 
 Parameters:
     DiscordToken:
-        Type: String
         Description: Discord Bot Security Token
+        Type: String
+        NoEcho: true
+    DockerImage:
+        Description: The container image to use in the task definition
+        Type: String
+        NoEcho: true
+    ContainerRegistryAccessToken:
+        Description: The access token for the Container registry
+        Type: String
+        NoEcho: true
 
 Resources:
     DiscordBotToken:
         Type: "AWS::SSM::Parameter"
         Properties:
-            Name: /discord-bot/DISCORD_BOT_TOKEN
+            Name: /prod/disco-bot/discord-bot-token
             Type: String
             Value: !Ref DiscordToken
-            Description: "Discord Bot Security Token"
-    Repository:
-        Type: "AWS::ECR::Repository"
+            Description: Discord Bot Security Token
+
+    ContainerRegistryCredentialsSecret:
+        Type: "AWS::SecretsManager::Secret"
         Properties:
-            RepositoryName: "discord-bot"
-            EmptyOnDelete: true
+            Name: /prod/disco-bot/container-registry-credentials
+            Description: Credentials to external container registry
+            SecretString: !Sub '{"username": "user", "password": "${ContainerRegistryAccessToken}"}'
+
+    ECSTaskExecutionRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service: "ecs-tasks.amazonaws.com"
+                          Action: "sts:AssumeRole"
+            ManagedPolicyArns:
+                - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+                - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+
+    ECSTaskDefinition:
+        Type: "AWS::ECS::TaskDefinition"
+        Properties:
+            Family: "disco-bot-task-definition"
+            NetworkMode: "awsvpc"
+            RequiresCompatibilities:
+                - "FARGATE"
+            RuntimePlatform:
+            CpuArchitecture: "X86_64"
+            OperatingSystemFamily: "LINUX"
+            Cpu: "256"
+            Memory: "0.5GB"
+            ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+            ContainerDefinitions:
+                - Name: "discord-bot-container"
+                  Image: !Ref DockerImage
+                  Essential: true
+                  RepositoryCredentials:
+                  CredentialsParameter: !Ref DockerCredentialsSecret
