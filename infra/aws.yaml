@@ -5,6 +5,17 @@ Parameters:
     DiscordToken:
         Type: String
         Description: Discord Bot Security Token
+    DockerImage:
+        Description: The Container image to use in the task definition
+        Type: String
+    DockerUsername:
+        Description: The username for the Container registry
+        Type: String
+        NoEcho: true
+    DockerPassword:
+        Description: The password for the Container registry
+        Type: String
+        NoEcho: true
 
 Resources:
     DiscordBotToken:
@@ -19,3 +30,47 @@ Resources:
         Properties:
             RepositoryName: "discord-bot"
             EmptyOnDelete: true
+
+    DockerCredentialsSecret:
+        Type: "AWS::SecretsManager::Secret"
+        Properties:
+            Name: "DockerRegistryCredentials"
+            GenerateSecretString:
+                SecretStringTemplate: '{"username":"<username>","password":"<password>"}'
+                GenerateStringKey: "DockerCredentials"
+                PasswordLength: 30
+                ExcludeCharacters: '"@/\\'
+
+    ECSTaskExecutionRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+        AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+                - Effect: Allow
+                  Principal:
+                  Service: "ecs-tasks.amazonaws.com"
+                  Action: "sts:AssumeRole"
+        ManagedPolicyArns:
+            - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+            - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+
+    ECSTaskDefinition:
+        Type: "AWS::ECS::TaskDefinition"
+        Properties:
+            Family: "discord-bot-task-definition"
+            NetworkMode: "awsvpc"
+            RequiresCompatibilities:
+                - "FARGATE"
+            RuntimePlatform:
+            CpuArchitecture: "X86_64"
+            OperatingSystemFamily: "LINUX"
+            Cpu: "256"
+            Memory: "0.5GB"
+            ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+            ContainerDefinitions:
+                - Name: "discord-bot-container"
+                  Image: !Ref DockerImage
+                  Essential: true
+                  RepositoryCredentials:
+                  CredentialsParameter: !Ref DockerCredentialsSecret
