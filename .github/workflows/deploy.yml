@@ -5,6 +5,10 @@ on:
     release:
         types: [published]
 
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
+
 jobs:
     deploy:
         runs-on: ubuntu-latest
@@ -21,5 +25,8 @@ jobs:
                   aws cloudformation deploy \
                   --template-file infra/aws.yaml \
                   --stack-name Discord-Bot-Service \
-                  --parameter-overrides DiscordToken=${{ secrets.DISCORD_BOT_TOKEN }}
-                  # --capabilities CAPABILITY_IAM
+                  --parameter-overrides \
+                        DiscordToken=${{ secrets.DISCORD_BOT_TOKEN }} \
+                        DockerImage=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+                        ContainerRegistryAccessToken=${{ secrets.GHCR_TOKEN }} \
+                  --capabilities CAPABILITY_IAM

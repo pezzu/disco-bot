@@ -3,17 +3,15 @@ Description: Discord Bot infrastructure
 
 Parameters:
     DiscordToken:
-        Type: String
         Description: Discord Bot Security Token
-    DockerImage:
-        Description: The Container image to use in the task definition
-        Type: String
-    DockerUsername:
-        Description: The username for the Container registry
         Type: String
         NoEcho: true
-    DockerPassword:
-        Description: The password for the Container registry
+    DockerImage:
+        Description: The container image to use in the task definition
+        Type: String
+        NoEcho: true
+    ContainerRegistryAccessToken:
+        Description: The access token for the Container registry
         Type: String
         NoEcho: true
 
@@ -21,44 +19,36 @@ Resources:
     DiscordBotToken:
         Type: "AWS::SSM::Parameter"
         Properties:
-            Name: /discord-bot/DISCORD_BOT_TOKEN
+            Name: /prod/disco-bot/discord-bot-token
             Type: String
             Value: !Ref DiscordToken
-            Description: "Discord Bot Security Token"
-    Repository:
-        Type: "AWS::ECR::Repository"
-        Properties:
-            RepositoryName: "discord-bot"
-            EmptyOnDelete: true
+            Description: Discord Bot Security Token
 
-    DockerCredentialsSecret:
+    ContainerRegistryCredentialsSecret:
         Type: "AWS::SecretsManager::Secret"
         Properties:
-            Name: "DockerRegistryCredentials"
-            GenerateSecretString:
-                SecretStringTemplate: '{"username":"<username>","password":"<password>"}'
-                GenerateStringKey: "DockerCredentials"
-                PasswordLength: 30
-                ExcludeCharacters: '"@/\\'
+            Name: /prod/disco-bot/container-registry-credentials
+            Description: Credentials to external container registry
+            SecretString: !Sub '{"username": "user", "password": "${ContainerRegistryAccessToken}"}'
 
     ECSTaskExecutionRole:
         Type: "AWS::IAM::Role"
         Properties:
-        AssumeRolePolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-                - Effect: Allow
-                  Principal:
-                  Service: "ecs-tasks.amazonaws.com"
-                  Action: "sts:AssumeRole"
-        ManagedPolicyArns:
-            - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-            - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service: "ecs-tasks.amazonaws.com"
+                          Action: "sts:AssumeRole"
+            ManagedPolicyArns:
+                - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+                - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
 
     ECSTaskDefinition:
         Type: "AWS::ECS::TaskDefinition"
         Properties:
-            Family: "discord-bot-task-definition"
+            Family: "disco-bot-task-definition"
             NetworkMode: "awsvpc"
             RequiresCompatibilities:
                 - "FARGATE"

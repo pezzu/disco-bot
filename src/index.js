@@ -28,7 +28,7 @@ for (const file of eventFiles) {
 
 const ssm = new SSMClient({ region: "us-east-1" });
 const param = {
-    Name: "/discord-bot/DISCORD_BOT_TOKEN",
+    Name: "/prod/disco-bot/container-registry-credentials",
     WithDecryption: false,
 };
 
